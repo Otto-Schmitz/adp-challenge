@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACTOR
+  INTERN
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  ON_LEAVE
+  TERMINATED
+}
+
+enum ManagementLevel {
+  TEAM_LEAD
+  MANAGER
+  DIRECTOR
+  VP
+}
+
+model Employee {
+  id              String          @id @default(uuid())
+  employeeNumber  String          @unique
+  firstName       String
+  lastName        String
+  email           String          @unique
+  phone           String?
+  departmentId    String?
+  department      Department?     @relation(fields: [departmentId], references: [id])
+  jobTitle        String
+  managerId       String?
+  manager         Employee?       @relation("EmployeeManager", fields: [managerId], references: [id])
+  directReports   Employee[]      @relation("EmployeeManager")
+  employmentType  EmploymentType
+  status          EmployeeStatus
+  hireDate        DateTime
+  terminationDate DateTime?
+  salary          Float
+  birthdate       DateTime
+  managerProfile  ManagerProfile?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([departmentId])
+  @@index([managerId])
+}
+
+model Department {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  managerId   String?
+  manager     Employee?  @relation(fields: [managerId], references: [id])
+  employees   Employee[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([managerId])
+}
+
+model ManagerProfile {
+  id              String          @id @default(uuid())
+  employeeId      String          @unique
+  employee        Employee        @relation(fields: [employeeId], references: [id])
+  managementLevel ManagementLevel
+  budget          Float
+  region          String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([employeeId])
+}
+

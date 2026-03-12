@@ -3,7 +3,9 @@ import type { EmployeeCreateInput, EmployeeUpdateInput } from '../validators/emp
 import { ApiError } from '../utils/errors';
 import { getPagination } from '../utils/pagination';
 import { parseEmployeeFilters } from '../utils/parse-query';
-import { EmploymentType, EmployeeStatus } from '@prisma/client';
+
+const EMPLOYMENT_TYPES = ['FULL_TIME', 'PART_TIME', 'CONTRACTOR', 'INTERN'];
+const EMPLOYEE_STATUSES = ['ACTIVE', 'ON_LEAVE', 'TERMINATED'];
 
 export class EmployeeService {
   static async create(rawData: EmployeeCreateInput) {
@@ -15,7 +17,7 @@ export class EmployeeService {
       throw new ApiError(400, 'Employee cannot manage themselves');
     }
 
-    if (data.status !== EmployeeStatus.TERMINATED && data.terminationDate) {
+    if (data.status !== 'TERMINATED' && data.terminationDate) {
       throw new ApiError(400, 'terminationDate must be null if status is not TERMINATED');
     }
 
@@ -37,20 +39,17 @@ export class EmployeeService {
 
     if (filters.departmentId) where.departmentId = filters.departmentId;
     if (filters.managerId) where.managerId = filters.managerId;
-    if (filters.status && Object.values(EmployeeStatus).includes(filters.status as EmployeeStatus)) {
+    if (filters.status && EMPLOYEE_STATUSES.includes(filters.status)) {
       where.status = filters.status;
     }
-    if (
-      filters.employmentType &&
-      Object.values(EmploymentType).includes(filters.employmentType as EmploymentType)
-    ) {
+    if (filters.employmentType && EMPLOYMENT_TYPES.includes(filters.employmentType)) {
       where.employmentType = filters.employmentType;
     }
     if (filters.search) {
       where.OR = [
-        { firstName: { contains: filters.search, mode: 'insensitive' } },
-        { lastName: { contains: filters.search, mode: 'insensitive' } },
-        { email: { contains: filters.search, mode: 'insensitive' } },
+        { firstName: { contains: filters.search } },
+        { lastName: { contains: filters.search } },
+        { email: { contains: filters.search } },
       ];
     }
 
@@ -90,7 +89,7 @@ export class EmployeeService {
       throw new ApiError(400, 'Employee cannot manage themselves');
     }
 
-    if (data.status && data.status !== EmployeeStatus.TERMINATED && data.terminationDate) {
+    if (data.status && data.status !== 'TERMINATED' && data.terminationDate) {
       throw new ApiError(400, 'terminationDate must be null if status is not TERMINATED');
     }
 

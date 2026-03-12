@@ -1,9 +1,10 @@
 import { z } from 'zod';
-import { ManagementLevel } from '@prisma/client';
+
+const managementLevels = ['TEAM_LEAD', 'MANAGER', 'DIRECTOR', 'VP'] as const;
 
 export const managerProfileCreateSchema = z.object({
   employeeId: z.string().uuid(),
-  managementLevel: z.nativeEnum(ManagementLevel),
+  managementLevel: z.enum(managementLevels),
   budget: z.number().nonnegative(),
   region: z.string().optional(),
 });

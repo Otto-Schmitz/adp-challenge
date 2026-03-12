@@ -7,25 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum EmploymentType {
-  FULL_TIME
-  PART_TIME
-  CONTRACTOR
-  INTERN
-}
-
-enum EmployeeStatus {
-  ACTIVE
-  ON_LEAVE
-  TERMINATED
-}
-
-enum ManagementLevel {
-  TEAM_LEAD
-  MANAGER
-  DIRECTOR
-  VP
-}
+// SQLite não suporta enums nativos; usar String e validar com Zod
+// Valores: EmploymentType = FULL_TIME | PART_TIME | CONTRACTOR | INTERN
+//         EmployeeStatus = ACTIVE | ON_LEAVE | TERMINATED
+//         ManagementLevel = TEAM_LEAD | MANAGER | DIRECTOR | VP
 
 model Employee {
   id              String          @id @default(uuid())
@@ -40,8 +25,9 @@ model Employee {
   managerId       String?
   manager         Employee?       @relation("EmployeeManager", fields: [managerId], references: [id])
   directReports   Employee[]      @relation("EmployeeManager")
-  employmentType  EmploymentType
-  status          EmployeeStatus
+  managedDepartments Department[] @relation("DepartmentManager")
+  employmentType  String
+  status          String
   hireDate        DateTime
   terminationDate DateTime?
   salary          Float
@@ -71,12 +57,10 @@ model ManagerProfile {
   id              String          @id @default(uuid())
   employeeId      String          @unique
   employee        Employee        @relation(fields: [employeeId], references: [id])
-  managementLevel ManagementLevel
+  managementLevel String
   budget          Float
   region          String?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
-
-  @@unique([employeeId])
 }
 

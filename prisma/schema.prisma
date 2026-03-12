@@ -35,7 +35,7 @@ model Employee {
   email           String          @unique
   phone           String?
   departmentId    String?
-  department      Department?     @relation(fields: [departmentId], references: [id])
+  department      Department?     @relation("DepartmentEmployees", fields: [departmentId], references: [id])
   jobTitle        String
   managerId       String?
   manager         Employee?       @relation("EmployeeManager", fields: [managerId], references: [id])
@@ -59,8 +59,8 @@ model Department {
   name        String
   description String?
   managerId   String?
-  manager     Employee?  @relation(fields: [managerId], references: [id])
-  employees   Employee[]
+  manager     Employee?  @relation("DepartmentManager", fields: [managerId], references: [id])
+  employees   Employee[] @relation("DepartmentEmployees")
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 

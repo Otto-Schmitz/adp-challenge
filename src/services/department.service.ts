@@ -9,6 +9,13 @@ export class DepartmentService {
       if (!manager) {
         throw new ApiError(400, 'Manager employee not found');
       }
+
+      const managerProfile = await prisma.managerProfile.findUnique({
+        where: { employeeId: data.managerId },
+      });
+      if (!managerProfile) {
+        throw new ApiError(400, 'Manager must have a manager profile');
+      }
     }
 
     return prisma.department.create({ data });
@@ -33,6 +40,13 @@ export class DepartmentService {
       const manager = await prisma.employee.findUnique({ where: { id: data.managerId } });
       if (!manager) {
         throw new ApiError(400, 'Manager employee not found');
+      }
+
+      const managerProfile = await prisma.managerProfile.findUnique({
+        where: { employeeId: data.managerId },
+      });
+      if (!managerProfile) {
+        throw new ApiError(400, 'Manager must have a manager profile');
       }
     }
 

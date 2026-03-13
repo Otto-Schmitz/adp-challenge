@@ -152,6 +152,13 @@ export class EmployeeService {
       if (idBeingUpdated && manager.id === idBeingUpdated) {
         throw new ApiError(400, 'Employee cannot manage themselves');
       }
+
+      const managerProfile = await prisma.managerProfile.findUnique({
+        where: { employeeId: data.managerId },
+      });
+      if (!managerProfile) {
+        throw new ApiError(400, 'Manager must have a manager profile');
+      }
     }
   }
 }

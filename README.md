@@ -11,6 +11,9 @@ A small **MVP REST API** built for the ADP challenge. It provides organizational
 - **Zod** — Request/body validation.
 - **Swagger UI** — API documentation at `/api-docs`.
 
+Companion frontend (React/Vite):  
+[adp-challenge-ui](https://github.com/Otto-Schmitz/adp-challenge-ui)
+
 ### Main entities
 
 | Entity          | Purpose |
